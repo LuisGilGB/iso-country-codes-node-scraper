@@ -9,3 +9,9 @@ if (fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir);
     console.log("Output directoty successfully created.");
 }
+
+const countriesScraper = require('./src/countriesScraper.js');
+
+countriesScraper()
+    .then(() => console.log('Done'))
+    .catch((err) => console.log(err));
