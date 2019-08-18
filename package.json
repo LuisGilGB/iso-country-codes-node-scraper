@@ -1,0 +1,27 @@
+{
+  "name": "iso-country-codes-node-scraper",
+  "version": "1.0.0",
+  "description": "Scraper made with NodeJS for ISO country codes list",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisGilGB/iso-country-codes-node-scraper.git"
+  },
+  "keywords": [
+    "ISO",
+    "countries",
+    "codes",
+    "Node",
+    "NodeJS",
+    "scraper"
+  ],
+  "author": "Luis Gil Gutiérrez de la Barreda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuisGilGB/iso-country-codes-node-scraper/issues"
+  },
+  "homepage": "https://github.com/LuisGilGB/iso-country-codes-node-scraper#readme"
+}
