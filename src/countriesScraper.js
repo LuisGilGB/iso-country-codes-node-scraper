@@ -10,10 +10,11 @@ const EN_WIKI_ISO_URL = 'https://en.wikipedia.org/wiki/ISO_3166-1';
 const EN_WIKI_CODES_TABLE_INDEX = 1;
 
 const getCountryDataFromRow = r => {
-    const cells = r.querySelectorAll('td');
+    const cells = [...r.querySelectorAll('td')];
     return {
-        name: cells[0].childNodes[1].innerHTML,
-        alpha2Code: cells[1].childNodes[0].innerHTML,
+        name      : cells[0].childNodes[2].innerHTML,
+        flag      : cells[0].childNodes[0].getAttribute('src'),
+        alpha2Code: cells[1].childNodes[0].childNodes[1].innerHTML,
         alpha3Code: cells[2].childNodes[1].innerHTML
     }
 }
