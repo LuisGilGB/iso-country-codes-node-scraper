@@ -29,8 +29,10 @@ const ES_WIKI_NAME_CELL_INDEX = 0;
 const ES_WIKI_NAME_CELL_SUBINDEX = 0;
 const ES_WIKI_ALPHA2_CELL_INDEX = 2;
 
+// From the thumb url, returns the source flag pic url at English Wikipedia.
 const parseFlagWikiUrl = thumbLink => `https://${thumbLink.split('/').filter((s,i) => FLAG_PATH_RELEVANT_SEGMENTS_INDEXES.includes(i)).join('/')}`;
 
+// Check the cells in a row to get the country data (name, flag url and alpha2, alpha3 and numeric codes).
 const getCountryDataFromEnWikiRow = r => {
     const cells = [...r.querySelectorAll('td')];
     return {
@@ -42,6 +44,7 @@ const getCountryDataFromEnWikiRow = r => {
     }
 }
 
+// Save a countries array into a country.json file into the output folder.
 const saveCountriesFile = (countries = []) => new Promise((resolve, reject) => {
     fs.writeFile(path.join(__dirname, '../output/countries.json'), JSON.stringify(countries, null, '  '), err => {
         if (err) {
@@ -52,6 +55,7 @@ const saveCountriesFile = (countries = []) => new Promise((resolve, reject) => {
     });
 });
 
+// Get the country alpha2 code from a row if it's a valid country row.
 const getCodeFromEsWikiRow = r => {
     const cells = [...r.querySelectorAll('td')];
     if (!(cells && cells.length)) {
@@ -60,6 +64,7 @@ const getCodeFromEsWikiRow = r => {
     return cells[ES_WIKI_ALPHA2_CELL_INDEX].innerHTML;
 }
 
+// Get the country name in Spanish from a row if it's a valid country row.
 const getEsNameFromRow = r => {
     const cell = r.querySelector('td');
     if (!cell) {
@@ -69,6 +74,8 @@ const getEsNameFromRow = r => {
             cell.childNodes[ES_WIKI_NAME_CELL_INDEX].innerHTML;
 }
 
+// Returns a map that associates country code and its name in Spanish from the ISO 3166-1 Spanish
+// Wikipedia entry.
 const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
     console.log('Spanish Wiki page loaded');
     const {document: pageDom} = new JSDOM(page).window;
@@ -82,6 +89,8 @@ const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
     resolve(spanishNamesMap);
 });
 
+// Returns a countries array with name, flag and codes data extracted from the ISO 3166-1 English
+// Wikipedia entry.
 const scrapeEnWikiPage = (resolve, reject) => page => {
     console.log('Wiki page loaded');
     const {document: pageDom} = new JSDOM(page).window;
@@ -93,6 +102,7 @@ const scrapeEnWikiPage = (resolve, reject) => page => {
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
     const countries = countriesRows.map(getCountryDataFromEnWikiRow);
 
+    // We want the names in Spanish too, so we take them from the Spanish Wikipedia.
     rp(ES_WIKI_ISO_URL)
         .then(page => {
             scrapeEsWikiPage(page)
@@ -111,6 +121,7 @@ const scrapeEnWikiPage = (resolve, reject) => page => {
 
 }
 
+// Run the scraping routine staring with the request of the Wikipedia entry for ISO 3166-1 standard.
 const countriesScraper = () => new Promise((resolve, reject) => {
     console.log("Let's start");
     rp(EN_WIKI_ISO_URL)
