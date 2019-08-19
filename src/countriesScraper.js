@@ -9,17 +9,36 @@ const EN_WIKI_ISO_URL = 'https://en.wikipedia.org/wiki/ISO_3166-1';
 const ES_WIKI_ISO_URL = 'https://es.wikipedia.org/wiki/ISO_3166-1';
 
 const EN_WIKI_CODES_TABLE_INDEX = 1;
+const ES_WIKI_CODES_TABLE_INDEX = 1;
 
-const parseFlagWikiUrl = thumbLink => `https://${thumbLink.split('/').filter((s,i) => [2,3,4,6,7,8].includes(i)).join('/')}`;
+const FLAG_PATH_RELEVANT_SEGMENTS_INDEXES = [2,3,4,6,7,8];
+
+const EN_FLAG_AND_NAME_CELL_INDEX = 0;
+const EN_FLAG_SUBINDEX = 0;
+const EN_NAME_SUBINDEX = 2;
+const EN_NAME_SUBSUBINDEX = 0;
+const EN_ALPHA2_CELL_INDEX = 1;
+const EN_ALPHA2_CELL_SUBINDEX = 0;
+const EN_ALPHA2_CELL_SUBSUBINDEX = 1;
+const EN_ALPHA3_CELL_INDEX = 2;
+const EN_ALPHA3_CELL_SUBINDEX = 1;
+const EN_NUMCODE_CELL_INDEX = 3;
+const EN_NUMCODE_CELL_SUBINDEX = 1;
+
+const ES_WIKI_NAME_CELL_INDEX = 0;
+const ES_WIKI_NAME_CELL_SUBINDEX = 0;
+const ES_WIKI_ALPHA2_CELL_INDEX = 2;
+
+const parseFlagWikiUrl = thumbLink => `https://${thumbLink.split('/').filter((s,i) => FLAG_PATH_RELEVANT_SEGMENTS_INDEXES.includes(i)).join('/')}`;
 
 const getCountryDataFromEnWikiRow = r => {
     const cells = [...r.querySelectorAll('td')];
     return {
-        name      : (cells[0].childNodes[2].childNodes[0] && cells[0].childNodes[2].childNodes[0].innerHTML) || cells[0].childNodes[2].innerHTML,
-        flag      : parseFlagWikiUrl(cells[0].childNodes[0].childNodes[0].getAttribute('src')),
-        alpha2Code: cells[1].childNodes[0].childNodes[1].innerHTML,
-        alpha3Code: cells[2].childNodes[1].innerHTML,
-        numCode   : cells[3].childNodes[1].innerHTML
+        name      : (cells[EN_FLAG_AND_NAME_CELL_INDEX].childNodes[EN_NAME_SUBINDEX].childNodes[EN_NAME_SUBSUBINDEX] && cells[EN_FLAG_AND_NAME_CELL_INDEX].childNodes[EN_NAME_SUBINDEX].childNodes[EN_NAME_SUBSUBINDEX].innerHTML) || cells[EN_FLAG_AND_NAME_CELL_INDEX].childNodes[EN_NAME_SUBINDEX].innerHTML,
+        flag      : parseFlagWikiUrl(cells[EN_FLAG_AND_NAME_CELL_INDEX].childNodes[EN_FLAG_SUBINDEX].childNodes[0].getAttribute('src')),
+        alpha2Code: cells[EN_ALPHA2_CELL_INDEX].childNodes[EN_ALPHA2_CELL_SUBINDEX].childNodes[EN_ALPHA2_CELL_SUBSUBINDEX].innerHTML,
+        alpha3Code: cells[EN_ALPHA3_CELL_INDEX].childNodes[EN_ALPHA3_CELL_SUBINDEX].innerHTML,
+        numCode   : cells[EN_NUMCODE_CELL_INDEX].childNodes[EN_NUMCODE_CELL_SUBINDEX].innerHTML
     }
 }
 
@@ -38,7 +57,7 @@ const getCodeFromEsWikiRow = r => {
     if (!(cells && cells.length)) {
         return false;
     }
-    return cells[2].innerHTML;
+    return cells[ES_WIKI_ALPHA2_CELL_INDEX].innerHTML;
 }
 
 const getEsNameFromRow = r => {
@@ -46,8 +65,8 @@ const getEsNameFromRow = r => {
     if (!cell) {
         return false;
     }
-    return (cell.childNodes[0].childNodes[0] && cell.childNodes[0].childNodes[0].innerHTML) ||
-            cell.childNodes[0].innerHTML;
+    return (cell.childNodes[ES_WIKI_NAME_CELL_INDEX].childNodes[ES_WIKI_NAME_CELL_SUBINDEX] && cell.childNodes[ES_WIKI_NAME_CELL_INDEX].childNodes[ES_WIKI_NAME_CELL_SUBINDEX].innerHTML) ||
+            cell.childNodes[ES_WIKI_NAME_CELL_INDEX].innerHTML;
 }
 
 const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
@@ -56,7 +75,7 @@ const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
     const rawTables = pageDom.querySelectorAll('table.wikitable');
     const tables = [...rawTables];
 
-    const countriesTable = tables[EN_WIKI_CODES_TABLE_INDEX];
+    const countriesTable = tables[ES_WIKI_CODES_TABLE_INDEX];
     const rawRows = countriesTable.querySelectorAll('tbody tr');
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
     const spanishNamesMap = countriesRows.reduce((obj0, r) => ({...obj0, [getCodeFromEsWikiRow(r)]: getEsNameFromRow(r)}), {});
