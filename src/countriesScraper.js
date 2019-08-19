@@ -58,9 +58,8 @@ const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
     const countriesTable = tables[EN_WIKI_CODES_TABLE_INDEX];
     const rawRows = countriesTable.querySelectorAll('tbody tr');
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
-    const countries = countriesRows.reduce((obj0, r) => ({...obj0, [getCodeFromEsWikiRow(r)]: getEsNameFromRow(r)}));
-    console.log(countries)
-    resolve();
+    const spanishNamesMap = countriesRows.reduce((obj0, r) => ({...obj0, [getCodeFromEsWikiRow(r)]: getEsNameFromRow(r)}));
+    resolve(spanishNamesMap);
 });
 
 const scrapeEnWikiPage = (resolve, reject) => page => {
@@ -77,8 +76,12 @@ const scrapeEnWikiPage = (resolve, reject) => page => {
     rp(ES_WIKI_ISO_URL)
         .then(page => {
             scrapeEsWikiPage(page)
-                .then(() => {
-                    saveCountriesFile(countries)
+                .then((spanishNamesMap) => {
+                    const extendedCountries = countries.map(c => ({
+                        ...c,
+                        esName: spanishNamesMap[c.alpha2Code]
+                    }));
+                    saveCountriesFile(extendedCountries)
                         .then(msg => resolve(msg))
                         .catch(err => reject(err));
                 })
