@@ -26,14 +26,19 @@ const scrapeEnWikiPage = (resolve, reject) => page => {
     const {document: pageDom} = new JSDOM(page).window;
     const rawTables = pageDom.querySelectorAll('table.wikitable');
     const tables = [...rawTables];
-    console.log(tables.length)
 
     const countriesTable = tables[EN_WIKI_CODES_TABLE_INDEX];
     const rawRows = countriesTable.querySelectorAll('tbody tr');
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
     const countries = countriesRows.map(getCountryDataFromRow);
-    console.log(countries);
-    resolve();
+
+    fs.writeFile(path.join(__dirname, '../output/countries.json'), JSON.stringify(countries, null, '  '), err => {
+        if (err) {
+            reject(err);
+        } else {
+            resolve('Countries successfully saved in a countries.json file into the output folder.');
+        }
+    });
 }
 
 const countriesScraper = () => new Promise((resolve, reject) => {

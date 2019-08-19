@@ -13,5 +13,8 @@ if (fs.existsSync(outputDir)) {
 const countriesScraper = require('./src/countriesScraper.js');
 
 countriesScraper()
-    .then(() => console.log('Done'))
+    .then((msg) => {
+        console.log(msg);
+        console.log('Done')
+    })
     .catch((err) => console.log(err));
