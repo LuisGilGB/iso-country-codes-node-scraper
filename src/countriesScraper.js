@@ -15,7 +15,7 @@ const parseFlagWikiUrl = thumbLink => `https://${thumbLink.split('/').filter((s,
 const getCountryDataFromEnWikiRow = r => {
     const cells = [...r.querySelectorAll('td')];
     return {
-        name      : cells[0].childNodes[2].innerHTML,
+        name      : (cells[0].childNodes[2].childNodes[0] && cells[0].childNodes[2].childNodes[0].innerHTML) || cells[0].childNodes[2].innerHTML,
         flag      : parseFlagWikiUrl(cells[0].childNodes[0].childNodes[0].getAttribute('src')),
         alpha2Code: cells[1].childNodes[0].childNodes[1].innerHTML,
         alpha3Code: cells[2].childNodes[1].innerHTML
