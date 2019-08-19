@@ -18,7 +18,8 @@ const getCountryDataFromEnWikiRow = r => {
         name      : (cells[0].childNodes[2].childNodes[0] && cells[0].childNodes[2].childNodes[0].innerHTML) || cells[0].childNodes[2].innerHTML,
         flag      : parseFlagWikiUrl(cells[0].childNodes[0].childNodes[0].getAttribute('src')),
         alpha2Code: cells[1].childNodes[0].childNodes[1].innerHTML,
-        alpha3Code: cells[2].childNodes[1].innerHTML
+        alpha3Code: cells[2].childNodes[1].innerHTML,
+        numCode   : cells[3].childNodes[1].innerHTML
     }
 }
 
