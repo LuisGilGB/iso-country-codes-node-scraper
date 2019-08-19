@@ -21,6 +21,16 @@ const getCountryDataFromRow = r => {
     }
 }
 
+const saveCountriesFile = (countries = []) => new Promise((resolve, reject) => {
+    fs.writeFile(path.join(__dirname, '../output/countries.json'), JSON.stringify(countries, null, '  '), err => {
+        if (err) {
+            reject(err);
+        } else {
+            resolve('Countries successfully saved in a countries.json file into the output folder.');
+        }
+    });
+});
+
 const scrapeEnWikiPage = (resolve, reject) => page => {
     console.log('Wiki page loaded');
     const {document: pageDom} = new JSDOM(page).window;
@@ -32,13 +42,9 @@ const scrapeEnWikiPage = (resolve, reject) => page => {
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
     const countries = countriesRows.map(getCountryDataFromRow);
 
-    fs.writeFile(path.join(__dirname, '../output/countries.json'), JSON.stringify(countries, null, '  '), err => {
-        if (err) {
-            reject(err);
-        } else {
-            resolve('Countries successfully saved in a countries.json file into the output folder.');
-        }
-    });
+    saveCountriesFile(countries)
+        .then(msg => resolve(msg))
+        .catch(err => reject(err));
 }
 
 const countriesScraper = () => new Promise((resolve, reject) => {
