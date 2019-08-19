@@ -6,12 +6,13 @@ const jsdom = require('jsdom');
 const {JSDOM} = jsdom;
 
 const EN_WIKI_ISO_URL = 'https://en.wikipedia.org/wiki/ISO_3166-1';
+const ES_WIKI_ISO_URL = 'https://es.wikipedia.org/wiki/ISO_3166-1';
 
 const EN_WIKI_CODES_TABLE_INDEX = 1;
 
 const parseFlagWikiUrl = thumbLink => `https://${thumbLink.split('/').filter((s,i) => [2,3,4,6,7,8].includes(i)).join('/')}`;
 
-const getCountryDataFromRow = r => {
+const getCountryDataFromEnWikiRow = r => {
     const cells = [...r.querySelectorAll('td')];
     return {
         name      : cells[0].childNodes[2].innerHTML,
@@ -31,6 +32,29 @@ const saveCountriesFile = (countries = []) => new Promise((resolve, reject) => {
     });
 });
 
+const getEsNameFromRow = r => {
+    const cell = r.querySelector('td');
+    if (!cell) {
+        return false;
+    }
+    return (cell.childNodes[0].childNodes[0] && cell.childNodes[0].childNodes[0].innerHTML) ||
+            cell.childNodes[0].innerHTML;
+}
+
+const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
+    console.log('Spanish Wiki page loaded');
+    const {document: pageDom} = new JSDOM(page).window;
+    const rawTables = pageDom.querySelectorAll('table.wikitable');
+    const tables = [...rawTables];
+
+    const countriesTable = tables[EN_WIKI_CODES_TABLE_INDEX];
+    const rawRows = countriesTable.querySelectorAll('tbody tr');
+    const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
+    const countries = countriesRows.map(getEsNameFromRow);
+    console.log(countries)
+    resolve();
+});
+
 const scrapeEnWikiPage = (resolve, reject) => page => {
     console.log('Wiki page loaded');
     const {document: pageDom} = new JSDOM(page).window;
@@ -40,11 +64,20 @@ const scrapeEnWikiPage = (resolve, reject) => page => {
     const countriesTable = tables[EN_WIKI_CODES_TABLE_INDEX];
     const rawRows = countriesTable.querySelectorAll('tbody tr');
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
-    const countries = countriesRows.map(getCountryDataFromRow);
+    const countries = countriesRows.map(getCountryDataFromEnWikiRow);
 
-    saveCountriesFile(countries)
-        .then(msg => resolve(msg))
+    rp(ES_WIKI_ISO_URL)
+        .then(page => {
+            scrapeEsWikiPage(page)
+                .then(() => {
+                    saveCountriesFile(countries)
+                        .then(msg => resolve(msg))
+                        .catch(err => reject(err));
+                })
+                .catch(err => reject(err));
+        })
         .catch(err => reject(err));
+
 }
 
 const countriesScraper = () => new Promise((resolve, reject) => {
