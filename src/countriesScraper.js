@@ -32,6 +32,14 @@ const saveCountriesFile = (countries = []) => new Promise((resolve, reject) => {
     });
 });
 
+const getCodeFromEsWikiRow = r => {
+    const cells = [...r.querySelectorAll('td')];
+    if (!(cells && cells.length)) {
+        return false;
+    }
+    return cells[2].innerHTML;
+}
+
 const getEsNameFromRow = r => {
     const cell = r.querySelector('td');
     if (!cell) {
@@ -50,7 +58,7 @@ const scrapeEsWikiPage = page => new Promise((resolve, reject) => {
     const countriesTable = tables[EN_WIKI_CODES_TABLE_INDEX];
     const rawRows = countriesTable.querySelectorAll('tbody tr');
     const countriesRows = [...rawRows].filter(r => r.querySelectorAll('td').length);
-    const countries = countriesRows.map(getEsNameFromRow);
+    const countries = countriesRows.reduce((obj0, r) => ({...obj0, [getCodeFromEsWikiRow(r)]: getEsNameFromRow(r)}));
     console.log(countries)
     resolve();
 });
