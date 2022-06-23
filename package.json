@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/LuisGilGB/iso-country-codes-node-scraper#readme",
   "dependencies": {
-    "jsdom": "^15.1.1",
+    "jsdom": "^16.5.0",
     "request-promise": "^4.2.4"
   }
 }
